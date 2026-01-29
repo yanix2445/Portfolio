@@ -14,7 +14,10 @@
       "!dist",
       "!build",
       "!bun.lock",
-      "!src/components/ui"
+      "!src/components/ui",
+      "!_bmad",
+      "!_bmad/**",
+      "!_bmad-output"
     ]
   },
   "formatter": {
