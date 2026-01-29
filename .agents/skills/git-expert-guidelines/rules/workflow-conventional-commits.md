@@ -4,6 +4,8 @@
 
 Utiliser la convention [Conventional Commits](https://www.conventionalcommits.org/) de manière stricte et complète. Un commit doit raconter une histoire claire et concise.
 
+**LANGUE OBLIGATOIRE : FRANÇAIS.** Tous les messages de commit (header, body, footer) doivent être rédigés exclusivement en français.
+
 ## Structure Obligatoire
 
 ```text
