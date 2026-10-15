@@ -6,7 +6,7 @@
 - Convex (région UE) : seul backend et seule base de données.
 - Better Auth et Resend, chacun via son composant Convex. Cloudflare Turnstile contre les robots.
 - shadcn/ui pour toute primitive UI : voir [design.md](design.md).
-- pnpm. Les versions sont dans [INSTALL.md](../INSTALL.md) (Stack summary).
+- **pnpm uniquement, jamais npm ni npx** : `pnpm add`, `pnpm exec <bin>` pour les outils du projet, `pnpm dlx <pkg>` pour un outil ponctuel. Seul lockfile : `pnpm-lock.yaml`. Les versions sont dans [INSTALL.md](../INSTALL.md) (Stack summary).
 
 ## Fonctionnement d'ensemble
 

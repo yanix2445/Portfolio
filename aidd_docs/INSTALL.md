@@ -47,12 +47,12 @@ Site vitrine personnel sur `yanis-harrat.com`, rapide et bien référencé. Un e
 | Mesure | Vercel Web Analytics + Speed Insights (sans cookie), liens `?utm_source=veille`. Suivi Resend **désactivé** | CNIL 2026 : un pixel de suivi exige un consentement préalable, et le suivi Resend se règle par domaine |
 | Hébergement | Vercel Hobby + Convex Free (UE) + Resend Free + Cloudflare (DNS, Turnstile). Infomaniak reste la boîte mail | 0 € |
 | Environnements | Local · Preview par PR · Production sur `main`. **Un backend Convex par environnement** | Jamais deux écrivains sur un même backend |
-| Paquets | pnpm | Rapide, verrouillage strict, déjà installé |
+| Paquets | **pnpm uniquement, jamais npm ni npx** : `pnpm add` pour installer, `pnpm exec` pour les outils du projet, `pnpm dlx` pour un outil ponctuel. Seul lockfile : `pnpm-lock.yaml`. Version épinglée par `packageManager` dans `package.json` | Choix de Yanis. Un seul gestionnaire, un seul lockfile, des installations reproductibles |
 | Tests | Vitest (unitaire) + convex-test (intégration backend) + Playwright/axe (E2E, **sur le poste**) + Lighthouse CI (**à chaque PR**, sur la preview) | L'intégration backend protège les vraies règles. Les E2E locaux restent simples pour apprendre. Lighthouse garde les seuils SEO et performance sous contrôle |
 
 ## Stack summary
 
-Versions relevées sur npm le 15/10/2026. Au scaffold, on installe la dernière version du même majeur.
+Versions relevées sur le registre npm le 15/10/2026. Au scaffold, on installe la dernière version du même majeur.
 
 - **Front-end** : `next` 16.4.x (Node ≥ 20.9 ; Vercel : Node 24.x), `react` 19.x, `tailwindcss` 4.3.x + `@tailwindcss/postcss` + `postcss`
 - **UI** : shadcn/ui via la CLI `shadcn` 4.x (`pnpm dlx shadcn@latest init`, puis `add <composant>`). Tailwind v4 pris en charge (`tailwind.config` laissé vide dans `components.json`). L'`init` installe ses dépendances et l'utilitaire `cn`. **Choix irréversibles après `init`, faits au scope Design system** : bibliothèque de base (`radix`, `base` ou `aria`), style, couleur de base, variables CSS (oui par défaut).
@@ -61,7 +61,7 @@ Versions relevées sur npm le 15/10/2026. Au scaffold, on installe la dernière 
   - chargement différé, pour ne pas dégrader le LCP et l'INP ciblés ;
   - Motion et GSAP se recoupent : chacun doit justifier son usage, sinon un seul est gardé.
 - **Back-end / BDD** : `convex` ≥ 1.46
-- **Auth** : `@convex-dev/better-auth` 0.12.x + `better-auth` **1.6.x** (le composant exige `>=1.6.11 <1.7.0`) + `@better-auth/passkey` 1.6.x (même version que `better-auth`)
+- **Auth** : `@convex-dev/better-auth` 0.12.x + `better-auth` **1.6.x** (le composant exige `>=1.6.11 <1.7.0`) + `@better-auth/passkey` 1.6.x (même version que `better-auth`). La CLI `auth` est en devDependency, à la même version, et s'appelle avec `pnpm exec auth generate`
 - **E-mails** : `@convex-dev/resend` 0.2.x (envoi) + `resend` 6.x (réception uniquement)
 - **Anti-robot** : script officiel Turnstile chargé depuis Cloudflare, sans paquet tiers
 - **Mesure** : `@vercel/analytics` 2.x + `@vercel/speed-insights` 2.x
@@ -161,10 +161,10 @@ sequenceDiagram
 
 | | Local | Preview | Production |
 | --- | --- | --- | --- |
-| Déclencheur | `pnpm dev` + `npx convex dev` | une PR / une branche poussée | push sur `main` |
+| Déclencheur | `pnpm dev` + `pnpm exec convex dev` | une PR / une branche poussée | push sur `main` |
 | URL | `http://localhost:3000` | URL `*.vercel.app` de la branche, protégée par Vercel Authentication | `https://yanis-harrat.com` (`www` → 308) |
 | Backend Convex | déploiement dev personnel | 1 déploiement **par branche**, créé par le build, supprimé après 5 jours | déploiement prod |
-| Qui pousse le code Convex | le watcher `npx convex dev` (seul) | le build Vercel (seul) | le build Vercel (seul) |
+| Qui pousse le code Convex | le watcher `pnpm exec convex dev` (seul) | le build Vercel (seul) | le build Vercel (seul) |
 | E-mails | mode test du composant (adresses `@resend.dev`) | mode test | envoi réel |
 | Réception Resend | simulée | simulée | réelle (1 seul webhook en plan gratuit) |
 | Turnstile | clés de test Cloudflare | clés de test Cloudflare | widget réel |
@@ -173,13 +173,13 @@ sequenceDiagram
 
 | Variable | Local (`.env.local`) | Preview | Production | Remarque |
 | --- | --- | --- | --- | --- |
-| `CONVEX_DEPLOYMENT` | écrite par `npx convex dev` | — | — | local uniquement |
-| `NEXT_PUBLIC_CONVEX_URL` | écrite par `npx convex dev` | injectée par `convex deploy --cmd` | injectée | **jamais** saisie dans Vercel |
-| `NEXT_PUBLIC_CONVEX_SITE_URL` | écrite par `npx convex dev` | injectée par `convex deploy --cmd` | injectée | **jamais** saisie dans Vercel |
-| `CONVEX_DEPLOY_KEY` | — | clé de déploiement *Preview* (sensible) | clé de déploiement *Production* (sensible) | lue par `npx convex deploy` |
+| `CONVEX_DEPLOYMENT` | écrite par `pnpm exec convex dev` | — | — | local uniquement |
+| `NEXT_PUBLIC_CONVEX_URL` | écrite par `pnpm exec convex dev` | injectée par `convex deploy --cmd` | injectée | **jamais** saisie dans Vercel |
+| `NEXT_PUBLIC_CONVEX_SITE_URL` | écrite par `pnpm exec convex dev` | injectée par `convex deploy --cmd` | injectée | **jamais** saisie dans Vercel |
+| `CONVEX_DEPLOY_KEY` | — | clé de déploiement *Preview* (sensible) | clé de déploiement *Production* (sensible) | lue par `pnpm exec convex deploy` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | `1x00000000000000000000AA` (test) | `1x00000000000000000000AA` (test) | clé du widget réel | publique |
 
-**Variables Convex** (par déploiement : `npx convex env set`, valeurs par défaut des previews : `npx convex env default`)
+**Variables Convex** (par déploiement : `pnpm exec convex env set`, valeurs par défaut des previews : `pnpm exec convex env default`)
 
 | Variable | Dev | Preview | Prod | Remarque |
 | --- | --- | --- | --- | --- |
@@ -193,13 +193,13 @@ sequenceDiagram
 | `TURNSTILE_SECRET_KEY` | `1x0000000000000000000000000000000AA` (test) | idem (test) | secret du widget réel | |
 | `CONVEX_SITE_URL`, `CONVEX_CLOUD_URL` | fournies par Convex | fournies | fournies | à ne pas définir |
 
-**Build Vercel** : `npx convex deploy --cmd 'pnpm run build'`. En Preview, le build pose ensuite `SITE_URL` sur le déploiement Convex de la branche (`npx convex env set --preview-name "$VERCEL_GIT_COMMIT_REF" …`). Ce mécanisme reste à valider sur une vraie PR au scope Environnements.
+**Build Vercel** : `pnpm exec convex deploy --cmd 'pnpm run build'`. En Preview, le build pose ensuite `SITE_URL` sur le déploiement Convex de la branche (`pnpm exec convex env set --preview-name "$VERCEL_GIT_COMMIT_REF" …`). Ce mécanisme reste à valider sur une vraie PR au scope Environnements.
 
 **Création du compte admin** (une fois par déploiement : dev, puis prod)
 
-1. Ouvrir la fenêtre : `npx convex env set AUTH_SIGNUP_OPEN true` (`--prod` pour la prod).
+1. Ouvrir la fenêtre : `pnpm exec convex env set AUTH_SIGNUP_OPEN true` (`--prod` pour la prod).
 2. Créer le compte **tout de suite** avec `yanis@yanis-harrat.com` via l'endpoint officiel `POST /api/auth/sign-up/email`. Aucune page d'inscription n'existe dans le site.
-3. Refermer : `npx convex env remove AUTH_SIGNUP_OPEN` (`--prod`).
+3. Refermer : `pnpm exec convex env remove AUTH_SIGNUP_OPEN` (`--prod`).
 4. Vérifier dans le dashboard Convex (tables du composant `betterAuth`) qu'il n'existe **qu'un seul** compte, supprimer tout autre compte, puis se connecter et activer le TOTP et la passkey dans `/admin/securite`.
 
 ## Testing
@@ -240,7 +240,7 @@ portfolio/
 │   ├── betterAuth/                        # composant en Local Install (exigé par la passkey)
 │   │   ├── convex.config.ts
 │   │   ├── auth.ts                        # export statique pour générer le schéma
-│   │   ├── schema.ts                      # GÉNÉRÉ par `npx auth generate` : ne pas éditer
+│   │   ├── schema.ts                      # GÉNÉRÉ par `pnpm exec auth generate` : ne pas éditer
 │   │   └── adapter.ts
 │   ├── lib/
 │   │   ├── requireAdmin.ts                # LE contrôle d'accès admin : session + e-mail du propriétaire
@@ -317,7 +317,7 @@ portfolio/
 ├── .github/workflows/                     # CI : lint, tsc, Vitest, Lighthouse CI (scope Tests et CI)
 ├── components.json                        # config shadcn/ui (alias ui → @/shared/ui, utils → @/shared/lib/utils)
 ├── vitest.config.ts · playwright.config.ts · lighthouserc.js
-├── .env.local                             # écrit par `npx convex dev`, jamais versionné
+├── .env.local                             # écrit par `pnpm exec convex dev`, jamais versionné
 ├── .gitignore
 ├── next.config.ts
 ├── postcss.config.mjs
@@ -346,7 +346,7 @@ Installation manuelle, un scope par étape (voir `ROADMAP.md`).
 1. **Poste** : Node ≥ 20.9, pnpm, comptes GitHub, Vercel, Convex, Resend et Cloudflare connectés.
 2. **Dépôt** : créer le dépôt GitHub, protéger `main` (tout passe par une PR), fixer les conventions de branches et de commits.
 3. **Scaffold** : Next.js 16 + TypeScript + Tailwind v4 avec pnpm, poser l'arbre `src/` minimal et les fichiers repris (icônes, hero).
-4. **Convex** : créer le projet en région UE, lancer `npx convex dev` (crée le déploiement dev et écrit `.env.local`), poser les variables Convex dev.
+4. **Convex** : créer le projet en région UE, lancer `pnpm exec convex dev` (crée le déploiement dev et écrit `.env.local`), poser les variables Convex dev.
 5. **Vercel** : lier `portfolio` au dépôt, définir la Build Command, ajouter les deux `CONVEX_DEPLOY_KEY`, poser les valeurs par défaut des previews Convex, activer la protection des previews, puis vérifier sur une PR de test que Preview et Prod ont chacun leur backend. Mettre en place la CI GitHub Actions (lint, `tsc`, Vitest, Lighthouse CI sur la preview) et le secret `VERCEL_AUTOMATION_BYPASS_SECRET`.
 6. **Resend, Turnstile, DNS** : appliquer l'état cible ci-dessus, puis poser les variables Convex prod.
 7. **Mise en ligne** (après la v1 complète) : brancher le domaine, configurer la redirection `www` → apex, vérifier les seuils de performance et Lighthouse.
@@ -376,3 +376,4 @@ La stack était imposée. L'audit l'a vérifiée composant par composant dans la
 - Charge utile exacte du webhook `email.received` : à confirmer au scope Réception.
 - Compatibilité de `convex-test` avec Vitest 5 : à vérifier au scope Tests et CI (sinon, rester sur Vitest 4).
 - Stabilité du seuil Lighthouse Performance ≥ 0,95 en CI : à observer sur les premières PR.
+- pnpm sur Vercel : la doc « Package Managers » ne détecte pnpm que jusqu'à la v10 via le lockfile. pnpm 12 (version locale) passera sans doute par Corepack (`packageManager` + variable `ENABLE_EXPERIMENTAL_COREPACK=1`), sinon on reste sur pnpm 10. À trancher aux scopes Scaffold et Environnements.
