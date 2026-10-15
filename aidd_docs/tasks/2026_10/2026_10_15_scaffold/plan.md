@@ -1,6 +1,6 @@
 ---
 objective: "Le dépôt contient un scaffold Next.js 16 + TypeScript + Tailwind v4 + ESLint géré par pnpm, qui build, passe le lint et affiche une page d'accueil provisoire en local."
-status: in-progress
+status: implemented
 ---
 
 # Plan: Scope 3 — Scaffold

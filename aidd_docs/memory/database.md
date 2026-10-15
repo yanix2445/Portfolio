@@ -3,6 +3,8 @@
 ## Setup
 
 - Convex, région UE `aws-eu-west-1` (Dublin), pour le RGPD. Schéma dans `convex/schema.ts`.
+- Projet `portfolio`, équipe `black-rise` : dev `good-goshawk-727`, prod `valuable-seahorse-421`, une preview par branche créée par le build.
+- La région se fixe à la création et ne se change plus : la vérifier dans le dashboard (page General du déploiement). Une URL UE contient `eu-west-1`. Un premier projet est sorti en US malgré la région d'équipe visée, et a dû être recréé.
 - Un backend Convex par environnement : voir [deployment.md](deployment.md).
 
 ## Entités principales

@@ -5,7 +5,7 @@ Toutes les commandes passent par pnpm, jamais npm ni npx. Les contrôles bloquan
 | But | Commande |
 | --- | --- |
 | Installer | `pnpm install` |
-| Lancer en local | `pnpm dev` (http://localhost:3000) |
+| Lancer en local | `pnpm dev` (http://localhost:3000) et, dans un second terminal, `pnpm exec convex dev` |
 | Lint | `pnpm lint` |
 | Types | `pnpm exec next typegen && pnpm exec tsc --noEmit` (sans `typegen`, un clone neuf échoue sur `LayoutProps`) |
 | Build | `pnpm build` |

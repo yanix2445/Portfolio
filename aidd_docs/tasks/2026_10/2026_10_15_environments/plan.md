@@ -1,6 +1,6 @@
 ---
 objective: "Le déploiement dev Convex tourne en UE, chaque branche poussée obtient sa preview Vercel avec son propre backend Convex, et `main` déploie sur le backend Convex de prod."
-status: in-progress
+status: implemented
 ---
 
 # Plan: Scope 4 — Environnements
