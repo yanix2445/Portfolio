@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "pnpm exec convex deploy --cmd 'pnpm run build' && if [ \"$VERCEL_ENV\" = preview ]; then pnpm exec convex env set --preview-name \"$VERCEL_GIT_COMMIT_REF\" SITE_URL \"https://$VERCEL_BRANCH_URL\"; fi"
+}

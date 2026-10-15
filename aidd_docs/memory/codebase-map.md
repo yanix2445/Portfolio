@@ -1,6 +1,6 @@
 # Codebase Map
 
-Seul le scaffold existe (scope 3) : `src/app/` (layout, page d'accueil provisoire dans `(public)/`, icônes) et `public/` (hero). Le reste de cette carte est la disposition validée, à suivre au fil des scopes. Arbre complet : [INSTALL.md](../INSTALL.md) (Folder structure).
+Existent : le scaffold (scope 3), soit `src/app/` (layout, page d'accueil provisoire dans `(public)/`, icônes) et `public/` (hero) ; puis `convex/` sans fonction (code généré, `tsconfig.json`) et `vercel.json` (scope 4). Le reste de cette carte est la disposition validée, à suivre au fil des scopes. Arbre complet : [INSTALL.md](../INSTALL.md) (Folder structure).
 
 ```mermaid
 flowchart TD
@@ -20,6 +20,7 @@ flowchart TD
 - `convex/betterAuth/` : composant Better Auth en Local Install.
 - `e2e/` : tests Playwright. `.github/workflows/` : CI. Emplacement des autres tests : [testing.md](testing.md).
 - `aidd_docs/` : `INSTALL.md`, `ROADMAP.md`, cette mémoire.
+- `.claude/skills/`, `.agents/skills/`, `skills-lock.json` : skills Convex copiés par la CLI Convex (AI files).
 
 ## Points d'entrée
 
@@ -27,3 +28,4 @@ flowchart TD
 - `convex/convex.config.ts` : composants `betterAuth` et `resend`.
 - `convex/http.ts` : routes HTTP, voir [api.md](api.md).
 - `AGENTS.md` et `CLAUDE.md` finissent par le bloc `nextjs-agent-rules` (lire `node_modules/next/dist/docs/`). `next dev` le tient à jour dans `AGENTS.md` seulement : le recopier à l'identique dans `CLAUDE.md` quand il change.
+- Puis par le bloc `convex-ai` (lire `convex/_generated/ai/guidelines.md`), écrit dans les deux fichiers et suivi par hash par la CLI Convex : ne pas l'éditer. Il cite `npx convex ai-files install` : à lancer en `pnpm exec`.

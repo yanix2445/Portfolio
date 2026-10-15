@@ -60,7 +60,7 @@ Versions relevées sur le registre npm le 15/10/2026. Au scaffold, on installe l
   - `prefers-reduced-motion` toujours respecté ;
   - chargement différé, pour ne pas dégrader le LCP et l'INP ciblés ;
   - Motion et GSAP se recoupent : chacun doit justifier son usage, sinon un seul est gardé.
-- **Back-end / BDD** : `convex` ≥ 1.46
+- **Back-end / BDD** : `convex` ≥ 1.46 (1.46.0 installé au scope 4, version exacte). Sa CLI installe aussi des « AI files » (section Convex dans `CLAUDE.md` et `AGENTS.md`, `convex/_generated/ai/`, skills Convex)
 - **Auth** : `@convex-dev/better-auth` 0.12.x + `better-auth` **1.6.x** (le composant exige `>=1.6.11 <1.7.0`) + `@better-auth/passkey` 1.6.x (même version que `better-auth`). La CLI `auth` est en devDependency, à la même version, et s'appelle avec `pnpm exec auth generate`
 - **E-mails** : `@convex-dev/resend` 0.2.x (envoi) + `resend` 6.x (réception uniquement)
 - **Anti-robot** : script officiel Turnstile chargé depuis Cloudflare, sans paquet tiers
@@ -193,7 +193,7 @@ sequenceDiagram
 | `TURNSTILE_SECRET_KEY` | `1x0000000000000000000000000000000AA` (test) | idem (test) | secret du widget réel | |
 | `CONVEX_SITE_URL`, `CONVEX_CLOUD_URL` | fournies par Convex | fournies | fournies | à ne pas définir |
 
-**Build Vercel** : `pnpm exec convex deploy --cmd 'pnpm run build'`. En Preview, le build pose ensuite `SITE_URL` sur le déploiement Convex de la branche (`pnpm exec convex env set --preview-name "$VERCEL_GIT_COMMIT_REF" …`). Ce mécanisme reste à valider sur une vraie PR au scope Environnements.
+**Build Vercel** (dans `vercel.json`, avec le preset `nextjs`) : `pnpm exec convex deploy --cmd 'pnpm run build'`. En Preview seulement (`VERCEL_ENV=preview`), le build pose ensuite `SITE_URL` sur le déploiement Convex de la branche : `pnpm exec convex env set --preview-name "$VERCEL_GIT_COMMIT_REF" SITE_URL "https://$VERCEL_BRANCH_URL"`. Validé au scope 4 sur la PR #4.
 
 **Création du compte admin** (une fois par déploiement : dev, puis prod)
 
@@ -231,6 +231,8 @@ portfolio/
 │   └── ROADMAP.md                         # scopes à venir
 │
 ├── convex/                                # BACKEND : données + règles
+│   ├── _generated/                        # GÉNÉRÉ par la CLI Convex (api, server, dataModel, ai/) : ne pas éditer
+│   ├── tsconfig.json                      # écrit par `pnpm exec convex dev`
 │   ├── convex.config.ts                   # composants : betterAuth (local) + resend
 │   ├── schema.ts                          # conversations, messages, abonnés, numéros de veille
 │   ├── http.ts                            # routes Better Auth + /resend-webhook (statuts + email.received) + désinscription en un clic
@@ -317,12 +319,14 @@ portfolio/
 ├── .github/workflows/                     # CI : lint, tsc, Vitest, Lighthouse CI (scope Tests et CI)
 ├── components.json                        # config shadcn/ui (alias ui → @/shared/ui, utils → @/shared/lib/utils)
 ├── vitest.config.ts · playwright.config.ts · lighthouserc.js
+├── .claude/skills/ · .agents/skills/     # skills Convex copiés par la CLI Convex (AI files) + skills-lock.json
 ├── .env.local                             # écrit par `pnpm exec convex dev`, jamais versionné
 ├── .gitignore
 ├── next.config.ts
-├── eslint.config.mjs
+├── vercel.json                            # preset Next.js + Build Command Convex
+├── eslint.config.mjs                      # ignore convex/_generated/
 ├── tsconfig.json
-├── pnpm-workspace.yaml                    # allowBuilds : sharp et unrs-resolver sans script d'installation
+├── pnpm-workspace.yaml                    # allowBuilds : esbuild, sharp et unrs-resolver sans script d'installation
 ├── pnpm-lock.yaml
 └── package.json
 ```
@@ -372,12 +376,12 @@ La stack était imposée. L'audit l'a vérifiée composant par composant dans la
 
 - Clé Resend `portfolio-prod-receive` en accès complet sur un compte qui gère aussi un autre domaine : stockée **uniquement** dans Convex prod.
 - Quota Resend : 100 e-mails/jour au total (envois + réceptions). Une veille envoyée à plus de ~90 abonnés devra être étalée, ou il faudra passer au payant.
-- `SITE_URL` des previews posée au build : à valider sur une vraie PR.
+- `SITE_URL` des previews posée au build : **vérifié au scope 4** (PR #4). Elle vaut l'URL de branche (`*-git-*.vercel.app`), pas l'URL propre à chaque déploiement : à prendre en compte au scope Auth.
 - Limitation de débit Better Auth : le stockage par défaut est « memory », à confirmer ou remplacer par le stockage en base au scope Auth.
 - Fenêtre d'inscription ouverte pendant la création du compte admin : risque réduit par la vérification de l'e-mail dans `requireAdmin` et par le contrôle « un seul compte » juste après.
 - Charge utile exacte du webhook `email.received` : à confirmer au scope Réception.
 - Compatibilité de `convex-test` avec Vitest 5 : à vérifier au scope Tests et CI (sinon, rester sur Vitest 4).
 - Stabilité du seuil Lighthouse Performance ≥ 0,95 en CI : à observer sur les premières PR.
 - pnpm sur Vercel : **vérifié au scope 3** (preview de la PR #3). Vercel CLI 64.0.2 lit `packageManager` et installe avec pnpm 12.4.2, sans Corepack, bien que la doc « Package Managers » (11/08/2026) s'arrête à pnpm 10.
-- Preset de framework du projet Vercel `portfolio` encore vide (« Other ») : la preview de la PR #3 builde mais ne sert que `public/` (`/` en 404). Preset Next.js à régler au scope Environnements.
+- Preset de framework : **réglé au scope 4** par `"framework": "nextjs"` dans `vercel.json` (le réglage du projet Vercel reste vide, le fichier l'emporte). La preview de la PR #4 sert la vraie page.
 - ESLint 9 est marqué « no longer supported » sur le registre. ESLint 10 passe le lint, mais `eslint-plugin-import`, `eslint-plugin-jsx-a11y` et `eslint-plugin-react` (tirés par `eslint-config-next` 16.4.1) ne le déclarent pas encore : rester sur ESLint 9 jusqu'à ce qu'ils le fassent.

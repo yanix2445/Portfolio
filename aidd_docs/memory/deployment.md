@@ -2,7 +2,7 @@
 
 ## Pipeline
 
-- GitHub → Vercel. Build Command : `pnpm exec convex deploy --cmd 'pnpm run build'`. Le build pousse le code Convex, puis construit Next.js en injectant `NEXT_PUBLIC_CONVEX_URL` et `NEXT_PUBLIC_CONVEX_SITE_URL`.
+- GitHub → Vercel. Preset et Build Command dans `vercel.json` : `pnpm exec convex deploy --cmd 'pnpm run build'`. Le build pousse le code Convex, puis construit Next.js en injectant `NEXT_PUBLIC_CONVEX_URL` et `NEXT_PUBLIC_CONVEX_SITE_URL`. En Preview seulement, il pose ensuite `SITE_URL` (URL de branche Vercel) sur la preview Convex de la branche.
 - Une PR ou une branche poussée → Preview. Un push sur `main` → Production.
 - Un seul écrivain par backend Convex : le watcher `pnpm exec convex dev` en local, le build Vercel en Preview et en Production.
 - Chaque PR passe aussi par la CI GitHub Actions : lint, `tsc`, Vitest, puis Lighthouse CI sur la preview (voir [testing.md](testing.md)).
@@ -23,6 +23,7 @@
 Valeurs par environnement : [INSTALL.md](../INSTALL.md) (Environments).
 
 - **Vercel / Next.js** : `CONVEX_DEPLOY_KEY` (une clé Preview, une clé Production, sensibles) et `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (publique). `CONVEX_DEPLOYMENT` existe en local uniquement.
+- `CONVEX_DEPLOY_KEY` : même nom deux fois, une portée Vercel chacune (la CLI ne lit que ce nom). La clé Production se crée sur le déploiement prod. La clé Preview se crée dans les **Project Settings** du projet Convex (Preview Deploy Keys), **jamais** sur un déploiement : une clé du déploiement dev ferait écrire chaque preview sur le dev.
 - `NEXT_PUBLIC_CONVEX_URL` et `NEXT_PUBLIC_CONVEX_SITE_URL` : écrites par `pnpm exec convex dev` en local, injectées par le build ailleurs, **jamais** saisies dans Vercel.
 - **Convex** (par déploiement avec `pnpm exec convex env set`, défauts des previews avec `pnpm exec convex env default`) : `SITE_URL`, `BETTER_AUTH_SECRET`, `AUTH_SIGNUP_OPEN`, `RESEND_API_KEY`, `RESEND_TEST_MODE`, `RESEND_WEBHOOK_SECRET`, `RESEND_RECEIVING_API_KEY`, `TURNSTILE_SECRET_KEY`.
 - Ne jamais définir `CONVEX_SITE_URL` ni `CONVEX_CLOUD_URL` : Convex les fournit.
