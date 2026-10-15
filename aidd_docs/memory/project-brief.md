@@ -8,7 +8,7 @@
 ## Pourquoi il existe
 
 - Être trouvé et contacté : site vitrine rapide et bien référencé.
-- Reconstruit de zéro depuis le 15/10/2026. Aucun code à ce jour. Le site reste hors ligne jusqu'à la v1 complète.
+- Reconstruit de zéro depuis le 15/10/2026. Scaffold Next.js en place (scope 3), aucune feature encore. Le site reste hors ligne jusqu'à la v1 complète.
 
 ## Vocabulaire
 

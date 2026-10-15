@@ -1,6 +1,6 @@
 # Codebase Map
 
-Aucun code à ce jour : cette carte est la disposition validée, à respecter dès le scaffold. Arbre complet : [INSTALL.md](../INSTALL.md) (Folder structure).
+Seul le scaffold existe (scope 3) : `src/app/` (layout, page d'accueil provisoire dans `(public)/`, icônes) et `public/` (hero). Le reste de cette carte est la disposition validée, à suivre au fil des scopes. Arbre complet : [INSTALL.md](../INSTALL.md) (Folder structure).
 
 ```mermaid
 flowchart TD
@@ -26,3 +26,4 @@ flowchart TD
 - `src/app/layout.tsx` : `<html>`, polices, Analytics, Speed Insights, provider Convex.
 - `convex/convex.config.ts` : composants `betterAuth` et `resend`.
 - `convex/http.ts` : routes HTTP, voir [api.md](api.md).
+- `AGENTS.md` et `CLAUDE.md` finissent par le bloc `nextjs-agent-rules` (lire `node_modules/next/dist/docs/`). `next dev` le tient à jour dans `AGENTS.md` seulement : le recopier à l'identique dans `CLAUDE.md` quand il change.

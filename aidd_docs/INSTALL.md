@@ -54,7 +54,7 @@ Site vitrine personnel sur `yanis-harrat.com`, rapide et bien référencé. Un e
 
 Versions relevées sur le registre npm le 15/10/2026. Au scaffold, on installe la dernière version du même majeur.
 
-- **Front-end** : `next` 16.4.x (Node ≥ 20.9 ; Vercel : Node 24.x), `react` 19.x, `tailwindcss` 4.3.x + `@tailwindcss/postcss` + `postcss`
+- **Front-end** : `next` 16.4.x (Node ≥ 20.9 ; Vercel : Node 24.x), `react` 19.x, `tailwindcss` 4.3.x + `@tailwindcss/turbopack` (loader Turbopack, sans PostCSS), `typescript` 5.x, `eslint` 9.x + `eslint-config-next`. Squelette généré par Yanis avec `pnpm dlx create-next-app` (scope 3) : React Compiler activé (`reactCompiler: true` + `babel-plugin-react-compiler` 1.x), Cache Components désactivé
 - **UI** : shadcn/ui via la CLI `shadcn` 4.x (`pnpm dlx shadcn@latest init`, puis `add <composant>`). Tailwind v4 pris en charge (`tailwind.config` laissé vide dans `components.json`). L'`init` installe ses dépendances et l'utilitaire `cn`. **Choix irréversibles après `init`, faits au scope Design system** : bibliothèque de base (`radix`, `base` ou `aria`), style, couleur de base, variables CSS (oui par défaut).
 - **Animations (pressenties, à trancher au scope Design system)** : Motion (ex-Framer Motion, paquet `motion` 14.x, import `motion/react`) et GSAP 3.x (+ `@gsap/react`, licence « standard no charge »). Garde-fous :
   - `prefers-reduced-motion` toujours respecté ;
@@ -320,8 +320,10 @@ portfolio/
 ├── .env.local                             # écrit par `pnpm exec convex dev`, jamais versionné
 ├── .gitignore
 ├── next.config.ts
-├── postcss.config.mjs
+├── eslint.config.mjs
 ├── tsconfig.json
+├── pnpm-workspace.yaml                    # allowBuilds : sharp et unrs-resolver sans script d'installation
+├── pnpm-lock.yaml
 └── package.json
 ```
 
@@ -376,4 +378,6 @@ La stack était imposée. L'audit l'a vérifiée composant par composant dans la
 - Charge utile exacte du webhook `email.received` : à confirmer au scope Réception.
 - Compatibilité de `convex-test` avec Vitest 5 : à vérifier au scope Tests et CI (sinon, rester sur Vitest 4).
 - Stabilité du seuil Lighthouse Performance ≥ 0,95 en CI : à observer sur les premières PR.
-- pnpm sur Vercel : la doc « Package Managers » ne détecte pnpm que jusqu'à la v10 via le lockfile. pnpm 12 (version locale) passera sans doute par Corepack (`packageManager` + variable `ENABLE_EXPERIMENTAL_COREPACK=1`), sinon on reste sur pnpm 10. À trancher aux scopes Scaffold et Environnements.
+- pnpm sur Vercel : **vérifié au scope 3** (preview de la PR #3). Vercel CLI 64.0.2 lit `packageManager` et installe avec pnpm 12.4.2, sans Corepack, bien que la doc « Package Managers » (11/08/2026) s'arrête à pnpm 10.
+- Preset de framework du projet Vercel `portfolio` encore vide (« Other ») : la preview de la PR #3 builde mais ne sert que `public/` (`/` en 404). Preset Next.js à régler au scope Environnements.
+- ESLint 9 est marqué « no longer supported » sur le registre. ESLint 10 passe le lint, mais `eslint-plugin-import`, `eslint-plugin-jsx-a11y` et `eslint-plugin-react` (tirés par `eslint-config-next` 16.4.1) ne le déclarent pas encore : rester sur ESLint 9 jusqu'à ce qu'ils le fassent.
