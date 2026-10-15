@@ -378,5 +378,6 @@ La stack était imposée. L'audit l'a vérifiée composant par composant dans la
 - Charge utile exacte du webhook `email.received` : à confirmer au scope Réception.
 - Compatibilité de `convex-test` avec Vitest 5 : à vérifier au scope Tests et CI (sinon, rester sur Vitest 4).
 - Stabilité du seuil Lighthouse Performance ≥ 0,95 en CI : à observer sur les premières PR.
-- pnpm sur Vercel : la doc « Package Managers » ne détecte pnpm que jusqu'à la v10 via le lockfile. Scaffold : `packageManager: pnpm@12.4.2` ; pnpm 12 écrit `lockfileVersion: '9.0'`, que Vercel installe avec pnpm 9 ou 10 sans Corepack. Version réellement utilisée à relever dans le log de la preview du scope 3 ; Corepack (`ENABLE_EXPERIMENTAL_COREPACK=1`) à trancher au scope Environnements.
+- pnpm sur Vercel : **vérifié au scope 3** (preview de la PR #3). Vercel CLI 64.0.2 lit `packageManager` et installe avec pnpm 12.4.2, sans Corepack, bien que la doc « Package Managers » (11/08/2026) s'arrête à pnpm 10.
+- Preset de framework du projet Vercel `portfolio` encore vide (« Other ») : la preview de la PR #3 builde mais ne sert que `public/` (`/` en 404). Preset Next.js à régler au scope Environnements.
 - ESLint 9 est marqué « no longer supported » sur le registre. ESLint 10 passe le lint, mais `eslint-plugin-import`, `eslint-plugin-jsx-a11y` et `eslint-plugin-react` (tirés par `eslint-config-next` 16.4.1) ne le déclarent pas encore : rester sur ESLint 9 jusqu'à ce qu'ils le fassent.
