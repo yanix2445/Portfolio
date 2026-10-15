@@ -19,5 +19,5 @@ Un seul rôle privilégié, le propriétaire. Isolation à trois niveaux :
 
 ## Pièges
 
-- `convex/betterAuth/schema.ts` est généré par `npx auth generate` : ne jamais l'éditer.
+- `convex/betterAuth/schema.ts` est généré par `pnpm exec auth generate` : ne jamais l'éditer.
 - La version de `better-auth` est imposée par la plage du composant, et `@better-auth/passkey` suit la même version que `better-auth` (voir INSTALL.md).
