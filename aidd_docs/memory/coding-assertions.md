@@ -1,3 +1,13 @@
 # Coding Assertions
 
-Aucune commande à ce jour : le dépôt n'a pas encore de `package.json`. Les commandes arrivent avec le scaffold (scope 3) et le scope Tests et CI (scope 5). Les contrôles bloquants et l'endroit où ils tournent sont dans [testing.md](testing.md).
+Toutes les commandes passent par pnpm, jamais npm ni npx. Les contrôles bloquants et l'endroit où ils tournent sont dans [testing.md](testing.md).
+
+| But | Commande |
+| --- | --- |
+| Installer | `pnpm install` |
+| Lancer en local | `pnpm dev` (http://localhost:3000) |
+| Lint | `pnpm lint` |
+| Types | `pnpm exec next typegen && pnpm exec tsc --noEmit` (sans `typegen`, un clone neuf échoue sur `LayoutProps`) |
+| Build | `pnpm build` |
+
+Les commandes de tests (Vitest, Playwright, Lighthouse CI) arrivent au scope Tests et CI.
