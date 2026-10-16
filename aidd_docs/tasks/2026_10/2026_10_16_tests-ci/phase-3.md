@@ -1,5 +1,5 @@
 ---
-status: pending
+status: in-progress
 ---
 
 # Instruction: CI GitHub Actions et Lighthouse sur la preview
