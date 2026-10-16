@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 ---
 
 # Instruction: CI GitHub Actions et Lighthouse sur la preview
@@ -13,7 +13,7 @@ status: in-progress
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml             ✅ job quality sur chaque PR : lint, typegen + tsc, Vitest
-│       └── lighthouse.yml     ✅ job lighthouse quand la preview Vercel est prête
+│       └── lighthouse.yml     ✅ job lighthouse quand la preview Vercel est prête, mesures de chaque passage affichées en cas d'échec
 ├── lighthouserc.js            ✅ URL de la preview, 3 passages, médiane, seuils, en-têtes, is-crawlable et robots-txt ignorés
 ├── package.json               ✏️ @lhci/cli
 ├── pnpm-lock.yaml             ✏️ dépendance ajoutée

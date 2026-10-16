@@ -1,6 +1,6 @@
 ---
 objective: "Chaque PR passe par lint, types, Vitest et Lighthouse CI sur sa preview Vercel, et une PR qui casse un test ou passe sous un seuil Lighthouse ne peut pas être fusionnée ; les E2E Playwright + axe passent sur le poste."
-status: in-progress
+status: implemented
 ---
 
 # Plan: Scope 5 — Tests et CI
@@ -25,7 +25,7 @@ status: in-progress
 
 | Source | Verified |
 | ------ | -------- |
-| Registre npm, lu par `pnpm view` (16/10/2026) | `vitest` 5.0.5 publiée, **5.0.4 installée** (pnpm ≥ 11 attend 1 jour avant d'installer une version, `minimumReleaseAge` = 1440 min, https://pnpm.io/settings/dependency-resolution ; 5.0.5 date du 15/10 14:29 UTC) (Node ≥ 22.12 ; `vite` ≥ 6.4 devient une dépendance pair **obligatoire** ; `@types/node` en pair optionnel `^22 \|\| >=24`), `vite` 8.3.4, `convex-test` 0.0.62 (pair : `convex ^1.43.0`, aucun pair Vitest), `@edge-runtime/vm` 5.0.0, `@playwright/test` 1.64.1, `@axe-core/playwright` 4.14.0, `@lhci/cli` 0.15.1 (Lighthouse 12.6.1), `@types/node` 24.19.2. Moteurs : `convex` Node ≥ 20, `next` ≥ 20.9 |
+| Registre npm, lu par `pnpm view` (16/10/2026) | `vitest` 5.0.5 (5.0.4 installée d'abord, montée à 16 h 29 : pnpm ≥ 11 attend 1 jour avant d'installer une version, `minimumReleaseAge` = 1440 min, https://pnpm.io/settings/dependency-resolution ; 5.0.5 date du 15/10 14:29 UTC) (Node ≥ 22.12 ; `vite` ≥ 6.4 devient une dépendance pair **obligatoire** ; `@types/node` en pair optionnel `^22 \|\| >=24`), `vite` 8.3.4, `convex-test` 0.0.62 (pair : `convex ^1.43.0`, aucun pair Vitest), `@edge-runtime/vm` 5.0.0, `@playwright/test` 1.64.1, `@axe-core/playwright` 4.14.0, `@lhci/cli` 0.15.1 (Lighthouse 12.6.1), `@types/node` 24.19.2. Moteurs : `convex` Node ≥ 20, `next` ≥ 20.9 |
 | Code de `convex-test` 0.0.62 (`dist/index.js`) | N'importe pas Vitest : seul `import.meta.glob` (fonction de Vite) charge les modules, et il cherche `_generated` dans la liste fournie. Compatible avec Vitest 5 |
 | Code de la CLI `convex` 1.46.0 (`dist/esm/bundler/index.js`) | Un fichier dont le nom contient plusieurs points (`x.test.ts`) est ignoré au déploiement : les tests ne partent jamais dans Convex |
 | `convex/_generated/ai/guidelines.md` + https://docs.convex.dev/testing/convex-test | `convex-test` + Vitest + `@edge-runtime/vm`, `environment: "edge-runtime"`, tests sous `convex/`, `import.meta.glob("./**/*.ts")` passé à `convexTest`, `/// <reference types="vite/client" />` dans les tests qui l'utilisent. Pas de crons, messages d'erreur différents du vrai backend |

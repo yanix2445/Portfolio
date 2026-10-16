@@ -1,6 +1,6 @@
 # Codebase Map
 
-Existent : le scaffold (scope 3), soit `src/app/` (layout, page d'accueil provisoire dans `(public)/`, icônes) et `public/` (hero) ; puis `convex/` sans fonction (code généré, `tsconfig.json`) et `vercel.json` (scope 4). Le reste de cette carte est la disposition validée, à suivre au fil des scopes. Arbre complet : [INSTALL.md](../INSTALL.md) (Folder structure).
+Existent : le scaffold (scope 3), soit `src/app/` (layout, page d'accueil provisoire dans `(public)/`, icônes) et `public/` (hero) ; puis `convex/` sans fonction (code généré, `tsconfig.json`) et `vercel.json` (scope 4) ; puis les tests et la CI (scope 5) : `convex/backend.test.ts`, `e2e/home.spec.ts`, `vitest.config.mts`, `playwright.config.ts`, `lighthouserc.js`, `.github/workflows/` (`ci.yml`, `lighthouse.yml`). Le reste de cette carte est la disposition validée, à suivre au fil des scopes. Arbre complet : [INSTALL.md](../INSTALL.md) (Folder structure).
 
 ```mermaid
 flowchart TD

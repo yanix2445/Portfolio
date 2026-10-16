@@ -6,7 +6,7 @@
 - Branche principale : `main`.
 - `main` protégée par le ruleset `main` : tout passe par une PR, fusion en squash uniquement, historique linéaire, ni force push ni suppression, aucun contournement. Aucune approbation exigée (un seul développeur).
 - Chaque PR ouvre une Preview Vercel avec son propre backend Convex.
-- Une PR est bloquée par la CI (contrôles dans [testing.md](testing.md)) : ses checks deviennent requis dans le ruleset dès qu'ils existent. Avant une PR qui touche un parcours critique, les E2E passent sur le poste.
+- Une PR est bloquée par la CI (contrôles dans [testing.md](testing.md)) : le ruleset exige les contrôles `quality` et `lighthouse` (application GitHub Actions), sans exiger une branche à jour avec `main`. Un contrôle rouge ou absent empêche la fusion. Avant une PR qui touche un parcours critique, les E2E passent sur le poste.
 
 ## Branches
 

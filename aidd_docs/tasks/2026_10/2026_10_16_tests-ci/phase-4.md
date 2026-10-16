@@ -1,5 +1,5 @@
 ---
-status: pending
+status: done
 ---
 
 # Instruction: Contrôles requis, démonstration, mémoire, fusion
