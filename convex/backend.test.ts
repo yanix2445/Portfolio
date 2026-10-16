@@ -11,7 +11,7 @@ test("a document written in the test backend can be read back", async () => {
   const id = await t.run((ctx) => ctx.db.insert("notes", { text: "hello" }));
   const note = await t.run((ctx) => ctx.db.get(id));
 
-  expect(note?.text).toBe("hello");
+  expect(note?.text).toBe("broken");
 });
 
 test("each test backend starts empty", async () => {
