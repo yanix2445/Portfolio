@@ -5,7 +5,7 @@
 - GitHub → Vercel. Preset et Build Command dans `vercel.json` : `pnpm exec convex deploy --cmd 'pnpm run build'`. Le build pousse le code Convex, puis construit Next.js en injectant `NEXT_PUBLIC_CONVEX_URL` et `NEXT_PUBLIC_CONVEX_SITE_URL`. En Preview seulement, il pose ensuite `SITE_URL` (URL de branche Vercel) sur la preview Convex de la branche.
 - Une PR ou une branche poussée → Preview. Un push sur `main` → Production.
 - Un seul écrivain par backend Convex : le watcher `pnpm exec convex dev` en local, le build Vercel en Preview et en Production.
-- Chaque PR passe aussi par la CI GitHub Actions : lint, `tsc`, Vitest, puis Lighthouse CI sur la preview (voir [testing.md](testing.md)).
+- Chaque PR passe aussi par la CI GitHub Actions : job `quality` (lint, `tsc`, Vitest) au push, puis job `lighthouse` quand Vercel signale la preview prête (GitHub Deployment `Preview`, un seul statut `success`). Détails : [testing.md](testing.md).
 
 ## Environnements
 
@@ -31,7 +31,7 @@ Valeurs par environnement : [INSTALL.md](../INSTALL.md) (Environments).
 - `AUTH_SIGNUP_OPEN` absente = inscription fermée. En prod, posée seulement pendant la fenêtre d'inscription.
 - `RESEND_TEST_MODE=false` en prod uniquement : seule la prod envoie réellement.
 - `RESEND_WEBHOOK_SECRET` et `RESEND_RECEIVING_API_KEY` : prod uniquement. La clé de réception a un accès complet sur un compte Resend partagé avec un autre domaine : elle ne vit **que** dans Convex prod.
-- **GitHub** : secret `VERCEL_AUTOMATION_BYPASS_SECRET` (« Protection Bypass for Automation » de Vercel), qui laisse Lighthouse CI passer la protection des previews.
+- **GitHub** : secret `VERCEL_AUTOMATION_BYPASS_SECRET` (« Protection Bypass for Automation » de Vercel, secret `github-lighthouse` du projet `portfolio`, posé le 16/10/2026), qui laisse Lighthouse CI passer la protection des previews. Il vaut pour toutes les previews du projet jusqu'à sa révocation ; sa valeur n'est jamais affichée ni écrite dans un fichier. Pour le changer : générer un nouveau secret dans Vercel, le poser avec `gh secret set VERCEL_AUTOMATION_BYPASS_SECRET`, puis révoquer l'ancien.
 - `.env.local` est écrit par `pnpm exec convex dev` et n'est jamais versionné.
 
 ## Mise en ligne

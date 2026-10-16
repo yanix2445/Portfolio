@@ -65,7 +65,7 @@ Versions relevées sur le registre npm le 15/10/2026. Au scaffold, on installe l
 - **E-mails** : `@convex-dev/resend` 0.2.x (envoi) + `resend` 6.x (réception uniquement)
 - **Anti-robot** : script officiel Turnstile chargé depuis Cloudflare, sans paquet tiers
 - **Mesure** : `@vercel/analytics` 2.x + `@vercel/speed-insights` 2.x
-- **Tests** : `vitest` (5.x publiée ; la doc `convex-test` documente Vitest 3 et 4, compatibilité à vérifier), `convex-test` 0.0.x + `@edge-runtime/vm`, `@playwright/test` 1.x + `@axe-core/playwright` 4.x, `@lhci/cli` 0.15.x
+- **Tests** (installés au scope 5) : `vitest` 5.x + `vite` 8.x (pair obligatoire de Vitest 5, fournit aussi les types `vite/client`), `convex-test` 0.0.x + `@edge-runtime/vm` 5.x, `@playwright/test` 1.x (Chromium seul) + `@axe-core/playwright` 4.x, `@lhci/cli` 0.15.x (Lighthouse 12.x). `@types/node` 24.x, la version de Node sur Vercel et en CI. Config Vitest en `vitest.config.mts` (syntaxe ESM sans `"type": "module"`)
 - **Hébergement** : Vercel (projet `portfolio`, équipe `yanis-harrat`), Convex Cloud (projet en UE), Resend (domaines `yanis-harrat.com` + `reply.yanis-harrat.com`), Cloudflare (zone `yanis-harrat.com`)
 
 ## Architecture
@@ -220,7 +220,8 @@ sequenceDiagram
 
 - **Emplacement** : les tests unitaires et d'intégration sont **à côté du code** (`convex/contact/admin.test.ts`, `src/features/…/x.test.ts`). Les E2E sont dans `e2e/` à la racine. Les Server Components `async` se testent en E2E (recommandation de la doc Next.js).
 - **E2E sur le poste** : contre un build local et le déploiement Convex dev, avec les clés Turnstile de test, Resend en mode test et un compte admin de test dans le déploiement dev.
-- **Lighthouse sur la preview** : un workflow GitHub se lance quand la preview Vercel est prête. Il passe la protection avec l'en-tête `x-vercel-protection-bypass` (secret GitHub `VERCEL_AUTOMATION_BYPASS_SECRET` ; « Protection Bypass for Automation » est disponible sur tous les plans). Si le seuil Performance ≥ 0,95 se révèle instable en CI, on en rediscute : jamais de baisse silencieuse.
+- **Lighthouse sur la preview** : le workflow `lighthouse.yml` se lance sur l'événement `deployment_status` (Vercel crée un GitHub Deployment `Preview` avec un seul statut `success` quand la preview est prête). Il passe la protection avec les en-têtes `x-vercel-protection-bypass` (secret GitHub `VERCEL_AUTOMATION_BYPASS_SECRET` ; « Protection Bypass for Automation » est disponible sur tous les plans) et `x-vercel-skip-toolbar`. Audits ignorés sur la preview, vérifiés en prod : `is-crawlable` (Vercel envoie `x-robots-tag: noindex`) et `robots-txt` (Lighthouse télécharge `/robots.txt` sans l'en-tête). Agrégation `median` forcée (la valeur par défaut, `optimistic`, garde la meilleure passe). Aucun rapport publié : il contient les en-têtes, donc le secret ; en cas d'échec, le job affiche les scores et mesures de chaque passage. Si le seuil Performance ≥ 0,95 se révèle instable en CI, on en rediscute : jamais de baisse silencieuse.
+- **CI** : `ci.yml`, job `quality` sur chaque PR (lint, `next typegen` + `tsc`, Vitest), Node 24, actions épinglées par SHA. `quality` et `lighthouse` sont des contrôles requis du ruleset `main`.
 
 ## Folder structure
 
@@ -318,7 +319,7 @@ portfolio/
 ├── e2e/                                   # tests Playwright (parcours critiques + axe)
 ├── .github/workflows/                     # CI : lint, tsc, Vitest, Lighthouse CI (scope Tests et CI)
 ├── components.json                        # config shadcn/ui (alias ui → @/shared/ui, utils → @/shared/lib/utils)
-├── vitest.config.ts · playwright.config.ts · lighthouserc.js
+├── vitest.config.mts · playwright.config.ts · lighthouserc.js
 ├── .claude/skills/ · .agents/skills/     # skills Convex copiés par la CLI Convex (AI files) + skills-lock.json
 ├── .env.local                             # écrit par `pnpm exec convex dev`, jamais versionné
 ├── .gitignore
@@ -368,7 +369,7 @@ La stack était imposée. L'audit l'a vérifiée composant par composant dans la
 | Convex Free (UE) | ✅ | Région UE en gratuit. Previews par branche (5 jours). `convex deploy --cmd` injecte l'URL et la site URL. Limites : 1 M appels/mois, 0,5 Go de base. |
 | Better Auth via composant Convex | ⚠️ | `better-auth` figé en 1.6.x. TOTP pris en charge d'office. La passkey impose le Local Install (schéma généré). Pas de « passkey puis TOTP » natif. |
 | Resend (composant + Receiving) | ⚠️ | Composant = envoi seul (mode test par défaut, `replyTo`/en-têtes, file d'attente, idempotence). Réception hors composant (exception validée). Plan gratuit : 100/jour, 3 000/mois (réception comprise), 1 webhook. Clé de réception en accès complet sur un compte partagé avec un autre site. |
-| Outillage de tests | ⚠️ | Vitest, Playwright et Testing Library sont documentés par Next.js. `convex-test` est officiel Convex (pas de crons, messages d'erreur différents du vrai backend), mais sa doc couvre Vitest 3 et 4 alors que Vitest 5 est sorti. La protection des previews se contourne pour la CI sur tous les plans. |
+| Outillage de tests | ⚠️ | Vitest, Playwright et Testing Library sont documentés par Next.js. `convex-test` est officiel Convex (pas de crons, messages d'erreur différents du vrai backend), et sa doc couvre Vitest 3 et 4, mais son code fonctionne avec Vitest 5 (vérifié au scope 5). La protection des previews se contourne pour la CI sur tous les plans. Lighthouse sur preview protégée : deux audits SEO non mesurables (`is-crawlable`, `robots-txt`). |
 | Cloudflare Turnstile | ✅ | Clés de test officielles pour local et preview. Les clés de prod refusent les jetons factices. |
 | Suivi des e-mails Resend | ❌ écarté | Pixel = consentement préalable (CNIL, mars 2026), suivi réglé par domaine. Remplacé par UTM + Vercel Analytics. |
 
@@ -380,8 +381,11 @@ La stack était imposée. L'audit l'a vérifiée composant par composant dans la
 - Limitation de débit Better Auth : le stockage par défaut est « memory », à confirmer ou remplacer par le stockage en base au scope Auth.
 - Fenêtre d'inscription ouverte pendant la création du compte admin : risque réduit par la vérification de l'e-mail dans `requireAdmin` et par le contrôle « un seul compte » juste après.
 - Charge utile exacte du webhook `email.received` : à confirmer au scope Réception.
-- Compatibilité de `convex-test` avec Vitest 5 : à vérifier au scope Tests et CI (sinon, rester sur Vitest 4).
-- Stabilité du seuil Lighthouse Performance ≥ 0,95 en CI : à observer sur les premières PR.
+- Compatibilité de `convex-test` avec Vitest 5 : **vérifiée au scope 5** dans le code de `convex-test` 0.0.62, qui n'importe pas Vitest et ne dépend que d'`import.meta.glob` (Vite).
+- Stabilité du seuil Lighthouse Performance ≥ 0,95 en CI : **à surveiller**. Au scope 5, sur la PR #5, 8 contrôles verts sur 9 pour la même page ; le seul rouge (médiane 0,90 : 0,78 / 0,99 / 0,90) était le premier passage sur un déploiement neuf. Choix de Yanis : seuil et config inchangés, on observe. Mesures relevées pendant la démonstration du blocage : le **premier passage** d'un job est lent (Performance 0,70, TBT 2 771 ms, FCP 1 290 ms), les deux suivants non (1 et 0,99, TBT ~90 ms), TTFB 13 ms partout. Cause : Chrome à froid sur la machine GitHub, pas le site ni Vercel. La médiane de 3 absorbe un seul passage lent. Si les échecs reviennent : ajouter un passage de chauffe non compté. Jamais de baisse silencieuse.
+- `extraHeaders` de Lighthouse part vers **toutes** les origines que la page appelle. Sans risque tant que la page n'appelle que son domaine ; au scope Turnstile (script Cloudflare), le secret de contournement partirait chez Cloudflare : changer de méthode à ce moment.
+- PR depuis un fork : `deployment_status` exécute le `lighthouse.yml` du commit déployé, avec le secret. Ne jamais approuver le déploiement Vercel d'un fork sans avoir lu ses changements de workflow.
+- `@lhci/cli` 0.15.1 (dernière version) tire 250 paquets dont 7 failles connues (`tmp`, `extract-zip`, `basic-ftp`, `uuid`, `sprintf-js`). Outil de dev, jamais livré sur le site, exécuté seulement en CI contre la preview : risque accepté, à revoir à chaque nouvelle version.
 - pnpm sur Vercel : **vérifié au scope 3** (preview de la PR #3). Vercel CLI 64.0.2 lit `packageManager` et installe avec pnpm 12.4.2, sans Corepack, bien que la doc « Package Managers » (11/08/2026) s'arrête à pnpm 10.
 - Preset de framework : **réglé au scope 4** par `"framework": "nextjs"` dans `vercel.json` (le réglage du projet Vercel reste vide, le fichier l'emporte). La preview de la PR #4 sert la vraie page.
 - ESLint 9 est marqué « no longer supported » sur le registre. ESLint 10 passe le lint, mais `eslint-plugin-import`, `eslint-plugin-jsx-a11y` et `eslint-plugin-react` (tirés par `eslint-config-next` 16.4.1) ne le déclarent pas encore : rester sur ESLint 9 jusqu'à ce qu'ils le fassent.
