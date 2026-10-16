@@ -22,9 +22,11 @@ module.exports = {
           "x-vercel-protection-bypass": bypassSecret,
           "x-vercel-skip-toolbar": "1",
         }),
-        // Vercel sends `x-robots-tag: noindex` on every preview, so indexability
-        // can only be checked in production.
-        skipAudits: ["is-crawlable"],
+        // Not measurable on a protected preview, checked in production instead:
+        // - is-crawlable: Vercel sends `x-robots-tag: noindex` on every preview.
+        // - robots-txt: Lighthouse fetches /robots.txt outside the page, without
+        //   the bypass header, so it reads the Vercel login page.
+        skipAudits: ["is-crawlable", "robots-txt"],
       },
     },
     assert: {

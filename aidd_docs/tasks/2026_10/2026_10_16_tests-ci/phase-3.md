@@ -14,7 +14,7 @@ status: in-progress
 │   └── workflows/
 │       ├── ci.yml             ✅ job quality sur chaque PR : lint, typegen + tsc, Vitest
 │       └── lighthouse.yml     ✅ job lighthouse quand la preview Vercel est prête
-├── lighthouserc.js            ✅ URL de la preview, 3 passages, médiane, seuils, en-têtes, is-crawlable ignoré
+├── lighthouserc.js            ✅ URL de la preview, 3 passages, médiane, seuils, en-têtes, is-crawlable et robots-txt ignorés
 ├── package.json               ✏️ @lhci/cli
 ├── pnpm-lock.yaml             ✏️ dépendance ajoutée
 └── .gitignore                 ✏️ .lighthouseci/
@@ -73,7 +73,7 @@ journey
 > La preview de chaque PR est mesurée dans les conditions réelles de Vercel.
 
 1. `pnpm add -D @lhci/cli` (script d'installation éventuel tranché avec Yanis).
-2. `lighthouserc.js` : URL lue dans l'environnement, `numberOfRuns: 3`, `extraHeaders` `x-vercel-protection-bypass` + `x-vercel-skip-toolbar`, `skipAudits: ["is-crawlable"]`, assertions `error` en `median` : Performance 0,95, SEO, Accessibilité, Bonnes pratiques 1. Aucune section `upload`.
+2. `lighthouserc.js` : URL lue dans l'environnement, `numberOfRuns: 3`, `extraHeaders` `x-vercel-protection-bypass` + `x-vercel-skip-toolbar`, `skipAudits: ["is-crawlable", "robots-txt"]`, assertions `error` en `median` : Performance 0,95, SEO, Accessibilité, Bonnes pratiques 1. Aucune section `upload`.
 3. `.github/workflows/lighthouse.yml` : `on: deployment_status`, job `lighthouse` seulement si `state == 'success'` et `environment == 'Preview'`, mêmes étapes d'installation, puis `pnpm exec lhci collect` et `pnpm exec lhci assert` avec l'URL `environment_url` et le secret passés par `env`.
 4. `.gitignore` : `.lighthouseci/`.
 
