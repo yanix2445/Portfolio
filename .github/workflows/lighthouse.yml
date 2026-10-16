@@ -27,3 +27,33 @@ jobs:
         env:
           PREVIEW_URL: ${{ github.event.deployment_status.environment_url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      # Without a report, print the scores and metrics of each run. Only these
+      # values are read from the results, never the settings that hold the headers.
+      - name: Show the metrics of each run
+        if: failure()
+        run: |
+          node --input-type=module <<'EOF'
+          import { readdirSync, readFileSync } from "node:fs";
+
+          const metrics = {
+            "first-contentful-paint": "FCP",
+            "largest-contentful-paint": "LCP",
+            "total-blocking-time": "TBT",
+            "cumulative-layout-shift": "CLS",
+            "speed-index": "SI",
+            "server-response-time": "TTFB",
+          };
+
+          const runs = readdirSync(".lighthouseci").filter((file) => /^lhr-.*\.json$/.test(file));
+          for (const [index, file] of runs.entries()) {
+            const result = JSON.parse(readFileSync(`.lighthouseci/${file}`, "utf8"));
+            const scores = Object.values(result.categories).map((category) => `${category.id} ${category.score}`);
+            const values = Object.entries(metrics).map(([id, label]) => {
+              const value = result.audits[id]?.numericValue;
+              if (value === undefined) return `${label} n/a`;
+              return id === "cumulative-layout-shift" ? `${label} ${value.toFixed(3)}` : `${label} ${Math.round(value)} ms`;
+            });
+            console.log(`Run ${index + 1}: ${scores.join(", ")}`);
+            console.log(`       ${values.join(", ")}`);
+          }
+          EOF
